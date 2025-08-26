@@ -23,6 +23,12 @@ app = Flask(__name__, static_folder="static", template_folder="templates")
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # Configure database
+db_url = os.environ.get("DATABASE_URL", "sqlite:///tasks.db")
+
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
+
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tasks.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
