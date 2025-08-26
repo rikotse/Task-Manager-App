@@ -15,7 +15,9 @@ else:
 # ------------------------
 # App Setup
 # ------------------------
-app = Flask(__name__)
+
+app = Flask(__name__, static_folder="static", template_folder="templates")
+
 
 # Allow all origins for API routes
 CORS(app, resources={r"/api/*": {"origins": "*"}})

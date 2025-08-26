@@ -4,8 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Task Manager</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
   </head>
   <body>
     <div class="app-container">
@@ -13,7 +19,11 @@
         <div class="header-content">
           <h1><i class="fas fa-tasks"></i> My Task Manager</h1>
           <div class="header-actions">
-            <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode">
+            <button
+              id="themeToggle"
+              class="theme-toggle"
+              aria-label="Toggle dark mode"
+            >
               <i class="fas fa-moon"></i>
             </button>
           </div>
@@ -25,9 +35,16 @@
           <div class="section-header">
             <h2>Add New Task</h2>
           </div>
-          <form class="task-form" id="taskForm" aria-label="Add a new task" onsubmit="event.preventDefault(); addTask();">
+          <form
+            class="task-form"
+            id="taskForm"
+            aria-label="Add a new task"
+            onsubmit="event.preventDefault(); addTask();"
+          >
             <div class="input-group">
-              <label for="taskInput" class="visually-hidden">Task Description</label>
+              <label for="taskInput" class="visually-hidden"
+                >Task Description</label
+              >
               <input
                 type="text"
                 id="taskInput"
@@ -39,19 +56,25 @@
 
             <div class="form-row">
               <div class="input-group">
-                <label for="dueDateInput" class="visually-hidden">Due Date</label>
+                <label for="dueDateInput" class="visually-hidden"
+                  >Due Date</label
+                >
                 <input type="date" id="dueDateInput" />
                 <span class="input-icon"><i class="far fa-calendar"></i></span>
               </div>
 
               <div class="input-group">
-                <label for="dueTimeInput" class="visually-hidden">Due Time</label>
+                <label for="dueTimeInput" class="visually-hidden"
+                  >Due Time</label
+                >
                 <input type="time" id="dueTimeInput" />
                 <span class="input-icon"><i class="far fa-clock"></i></span>
               </div>
 
               <div class="input-group">
-                <label for="priorityInput" class="visually-hidden">Priority</label>
+                <label for="priorityInput" class="visually-hidden"
+                  >Priority</label
+                >
                 <select id="priorityInput">
                   <option value="low">🟢 Low</option>
                   <option value="medium" selected>🟡 Medium</option>
@@ -100,9 +123,17 @@
 
           <div class="date-filter">
             <div class="input-group">
-              <label for="filterDate"><i class="far fa-calendar-alt"></i> View tasks for:</label>
+              <label for="filterDate"
+                ><i class="far fa-calendar-alt"></i> View tasks for:</label
+              >
               <input type="date" id="filterDate" />
-              <button type="button" onclick="clearDateFilter()" class="secondary-btn">Clear</button>
+              <button
+                type="button"
+                onclick="clearDateFilter()"
+                class="secondary-btn"
+              >
+                Clear
+              </button>
             </div>
           </div>
         </section>
@@ -152,6 +183,6 @@
       Your browser does not support JavaScript or it is disabled.
     </noscript>
 
-    <script src="app.js"></script>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
   </body>
 </html>
