@@ -6,35 +6,29 @@ import traceback
 from flask_migrate import Migrate
 import os
 
-if os.path.exists("tasks.db"):
-    os.remove("tasks.db")
-    print("tasks.db deleted")
-else:
-    print("tasks.db not found")
-
 # ------------------------
 # App Setup
 # ------------------------
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
 
-
 # Allow all origins for API routes
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # Configure database
+# Use Render's DATABASE_URL if available, otherwise fall back to SQLite for local dev
 db_url = os.environ.get("DATABASE_URL", "sqlite:///tasks.db")
-
+# Render sometimes gives postgres:// but SQLAlchemy needs postgresql://
 if db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql://", 1)
 
-
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tasks.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Initialize database object
+# Initialize database
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+
 # ------------------------
 # Database Model
 # ------------------------
@@ -55,12 +49,6 @@ class Task(db.Model):
             'priority': self.priority,
             'completed': self.completed
         }
-
-# ------------------------
-# Create database tables
-# ------------------------
-with app.app_context():
-    db.create_all()
 
 # ------------------------
 # Routes
