@@ -29,6 +29,10 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
+# Ensure tables are created before the first request
+with app.app_context():
+    db.create_all()
+
 # ------------------------
 # Database Model
 # ------------------------
