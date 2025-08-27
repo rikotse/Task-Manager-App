@@ -1,4 +1,4 @@
-let currentTheme = 'light';
+let currentTheme = "light";
 
 // 🔔 Ask user for browser notification permission
 if ("Notification" in window && Notification.permission !== "granted") {
@@ -21,27 +21,31 @@ let filterDate = null;
 // Global tasks array - fetched from backend
 let tasks = [];
 
-const API_BASE = "http://127.0.0.1:5000/api/tasks";
+const API_BASE =
+  window.location.hostname === "localhost" ||
+  window.location.hostname === "127.0.0.1"
+    ? "http://127.0.0.1:5000/api/tasks"
+    : "https://your-app-name.onrender.com/api/tasks";
 
 // Theme toggle functionality
 function toggleTheme() {
-  const themeToggle = document.getElementById('themeToggle');
-  const icon = themeToggle.querySelector('i');
-  
-  if (currentTheme === 'light') {
-    document.documentElement.setAttribute('data-theme', 'dark');
-    currentTheme = 'dark';
-    icon.classList.remove('fa-moon');
-    icon.classList.add('fa-sun');
+  const themeToggle = document.getElementById("themeToggle");
+  const icon = themeToggle.querySelector("i");
+
+  if (currentTheme === "light") {
+    document.documentElement.setAttribute("data-theme", "dark");
+    currentTheme = "dark";
+    icon.classList.remove("fa-moon");
+    icon.classList.add("fa-sun");
   } else {
-    document.documentElement.removeAttribute('data-theme');
-    currentTheme = 'light';
-    icon.classList.remove('fa-sun');
-    icon.classList.add('fa-moon');
+    document.documentElement.removeAttribute("data-theme");
+    currentTheme = "light";
+    icon.classList.remove("fa-sun");
+    icon.classList.add("fa-moon");
   }
 
   // Save theme preference to localStorage
-  localStorage.setItem('theme', currentTheme);
+  localStorage.setItem("theme", currentTheme);
 }
 
 // Fetch all tasks from backend API
@@ -62,14 +66,17 @@ async function fetchTasks() {
     if (!res.ok) {
       throw new Error(`HTTP error! status: ${res.status}`);
     }
-    
+
     tasks = await res.json();
     renderTasks();
     renderCalendar();
     updateTaskCount();
   } catch (error) {
     console.error("Failed to fetch tasks:", error);
-    showNotification("Could not connect to the backend. Please check if the server is running.", 'error');
+    showNotification(
+      "Could not connect to the backend. Please check if the server is running.",
+      "error"
+    );
     taskList.innerHTML = '<div class="empty-state">Unable to load tasks</div>';
   }
 }
@@ -115,7 +122,9 @@ function renderTasks() {
     taskItem.className =
       "task-item" +
       (task.completed ? " completed" : "") +
-      (isOverdue(task.dueDate, task.dueTime) && !task.completed ? " overdue" : "");
+      (isOverdue(task.dueDate, task.dueTime) && !task.completed
+        ? " overdue"
+        : "");
 
     taskItem.innerHTML = `
       <div class="task-content">
@@ -124,9 +133,20 @@ function renderTasks() {
           ${
             task.dueDate
               ? `<div class="due-date">
-                  <i class="far fa-calendar"></i> Due: ${formatDate(task.dueDate)}
-                  ${task.dueTime ? `<span class="time-badge"><i class="far fa-clock"></i> ${formatTime(task.dueTime)}</span>` : ''}
-                  <span class="countdown">${getCountdown(task.dueDate, task.dueTime)}</span>
+                  <i class="far fa-calendar"></i> Due: ${formatDate(
+                    task.dueDate
+                  )}
+                  ${
+                    task.dueTime
+                      ? `<span class="time-badge"><i class="far fa-clock"></i> ${formatTime(
+                          task.dueTime
+                        )}</span>`
+                      : ""
+                  }
+                  <span class="countdown">${getCountdown(
+                    task.dueDate,
+                    task.dueTime
+                  )}</span>
                 </div>`
               : ""
           }
@@ -140,13 +160,19 @@ function renderTasks() {
         </div>
       </div>
       <div class="task-actions">
-        <button class="task-btn complete-btn" onclick="toggleComplete(${task.id})" title="${task.completed ? 'Undo complete' : 'Complete task'}">
-          <i class="fas ${task.completed ? 'fa-undo' : 'fa-check'}"></i>
+        <button class="task-btn complete-btn" onclick="toggleComplete(${
+          task.id
+        })" title="${task.completed ? "Undo complete" : "Complete task"}">
+          <i class="fas ${task.completed ? "fa-undo" : "fa-check"}"></i>
         </button>
-        <button class="task-btn edit-btn" onclick="editTask(${task.id})" title="Edit task">
+        <button class="task-btn edit-btn" onclick="editTask(${
+          task.id
+        })" title="Edit task">
           <i class="fas fa-edit"></i>
         </button>
-        <button class="task-btn delete-btn" onclick="deleteTask(${task.id})" title="Delete task">
+        <button class="task-btn delete-btn" onclick="deleteTask(${
+          task.id
+        })" title="Delete task">
           <i class="fas fa-trash"></i>
         </button>
       </div>
@@ -158,21 +184,21 @@ function renderTasks() {
 
 // Format date to more readable format
 function formatDate(dateString) {
-  if (!dateString) return '';
+  if (!dateString) return "";
   const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'short', 
-    day: 'numeric' 
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
   });
 }
 
 // Format time to 12-hour format
 function formatTime(timeString) {
-  if (!timeString) return '';
-  const [hours, minutes] = timeString.split(':');
+  if (!timeString) return "";
+  const [hours, minutes] = timeString.split(":");
   const hour = parseInt(hours);
-  const ampm = hour >= 12 ? 'PM' : 'AM';
+  const ampm = hour >= 12 ? "PM" : "AM";
   const formattedHour = hour % 12 || 12;
   return `${formattedHour}:${minutes} ${ampm}`;
 }
@@ -210,48 +236,48 @@ async function addTask() {
     priorityInput.value = "medium";
 
     await fetchTasks();
-    showNotification('Task added successfully!', 'success');
+    showNotification("Task added successfully!", "success");
   } catch (error) {
     console.error("Failed to add task:", error);
-    showNotification(`Failed to add task: ${error.message}`, 'error');
+    showNotification(`Failed to add task: ${error.message}`, "error");
   }
 }
 
 // Delete task by id via API
 async function deleteTask(taskId) {
-  if (!confirm('Are you sure you want to delete this task?')) {
+  if (!confirm("Are you sure you want to delete this task?")) {
     return;
   }
 
   try {
-    const response = await fetch(`${API_BASE}/${taskId}`, { 
-      method: "DELETE" 
+    const response = await fetch(`${API_BASE}/${taskId}`, {
+      method: "DELETE",
     });
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     await fetchTasks();
-    showNotification('Task deleted successfully!', 'success');
+    showNotification("Task deleted successfully!", "success");
   } catch (error) {
     console.error("Failed to delete task:", error);
-    showNotification(`Failed to delete task: ${error.message}`, 'error');
+    showNotification(`Failed to delete task: ${error.message}`, "error");
   }
 }
 
 // Toggle task completion and update via API
 async function toggleComplete(taskId) {
-  const task = tasks.find(t => t.id === taskId);
+  const task = tasks.find((t) => t.id === taskId);
   if (!task) return;
-  
-  const updatedTask = {...task, completed: !task.completed};
+
+  const updatedTask = { ...task, completed: !task.completed };
   await updateTask(taskId, updatedTask);
 }
 
 // Edit task fields and update via API
 async function editTask(taskId) {
-  const task = tasks.find(t => t.id === taskId);
+  const task = tasks.find((t) => t.id === taskId);
   if (!task) return;
 
   const newText = prompt("Edit your task:", task.text);
@@ -281,7 +307,7 @@ async function editTask(taskId) {
     text: newText.trim(),
     dueDate: newDate,
     dueTime: newTime,
-    priority: newPriority
+    priority: newPriority,
   };
 
   await updateTask(taskId, updatedTask);
@@ -301,10 +327,10 @@ async function updateTask(taskId, task) {
     }
 
     await fetchTasks();
-    showNotification('Task updated successfully!', 'success');
+    showNotification("Task updated successfully!", "success");
   } catch (error) {
     console.error("Failed to update task:", error);
-    showNotification(`Failed to update task: ${error.message}`, 'error');
+    showNotification(`Failed to update task: ${error.message}`, "error");
   }
 }
 
@@ -334,7 +360,7 @@ function clearDateFilter() {
 // Send browser notification reminder
 function sendReminder(task) {
   if ("Notification" in window && Notification.permission === "granted") {
-    const timeText = task.dueTime ? ` at ${formatTime(task.dueTime)}` : '';
+    const timeText = task.dueTime ? ` at ${formatTime(task.dueTime)}` : "";
     new Notification("⏰ Task Reminder", {
       body: `"${task.text}" is due today${timeText}!`,
       icon: "https://cdn-icons-png.flaticon.com/512/1828/1828919.png",
@@ -345,33 +371,38 @@ function sendReminder(task) {
 // Countdown helper
 function getCountdown(dueDate, dueTime) {
   if (!dueDate) return "";
-  
+
   const now = new Date();
   let due = new Date(dueDate);
-  
+
   // Add time if specified
   if (dueTime) {
-    const [hours, minutes] = dueTime.split(':');
+    const [hours, minutes] = dueTime.split(":");
     due.setHours(parseInt(hours), parseInt(minutes), 0, 0);
   }
-  
+
   const diffTime = due - now;
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-  const diffHours = Math.floor((diffTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const diffHours = Math.floor(
+    (diffTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+  );
   const diffMinutes = Math.floor((diffTime % (1000 * 60 * 60)) / (1000 * 60));
 
   if (diffDays > 1) return `(${diffDays} days left)`;
   if (diffDays === 1) return `(Due tomorrow)`;
-  if (diffDays === 0 && diffHours > 0) return `(Due in ${diffHours}h ${diffMinutes}m)`;
-  if (diffDays === 0 && diffHours === 0 && diffMinutes > 0) return `(Due in ${diffMinutes}m)`;
-  if (diffDays === 0 && diffHours === 0 && diffMinutes === 0) return `(Due now!)`;
+  if (diffDays === 0 && diffHours > 0)
+    return `(Due in ${diffHours}h ${diffMinutes}m)`;
+  if (diffDays === 0 && diffHours === 0 && diffMinutes > 0)
+    return `(Due in ${diffMinutes}m)`;
+  if (diffDays === 0 && diffHours === 0 && diffMinutes === 0)
+    return `(Due now!)`;
   if (diffTime < 0) return `(Overdue)`;
 }
 
 // Render calendar weekly view
 function renderCalendar() {
   if (!calendarGrid) return;
-  
+
   calendarGrid.innerHTML = "";
 
   const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -395,7 +426,9 @@ function renderCalendar() {
       renderTasks();
     };
 
-    const dateLabel = `${daysOfWeek[i]} ${dayDate.getDate()}/${dayDate.getMonth() + 1}`;
+    const dateLabel = `${daysOfWeek[i]} ${dayDate.getDate()}/${
+      dayDate.getMonth() + 1
+    }`;
     dayColumn.innerHTML = `<h3>${dateLabel}</h3>`;
 
     if (dayTasks.length === 0) {
@@ -403,13 +436,17 @@ function renderCalendar() {
     } else {
       dayTasks.forEach((task) => {
         const taskDiv = document.createElement("div");
-        taskDiv.className = `calendar-task ${task.priority} ${task.completed ? "completed" : ""}`;
-        
-        let timeText = '';
+        taskDiv.className = `calendar-task ${task.priority} ${
+          task.completed ? "completed" : ""
+        }`;
+
+        let timeText = "";
         if (task.dueTime) {
-          timeText = `<div class="task-time"><i class="far fa-clock"></i> ${formatTime(task.dueTime)}</div>`;
+          timeText = `<div class="task-time"><i class="far fa-clock"></i> ${formatTime(
+            task.dueTime
+          )}</div>`;
         }
-        
+
         taskDiv.innerHTML = `
           <span>${task.text}</span>
           ${timeText}
@@ -426,43 +463,43 @@ function renderCalendar() {
 // Overdue check
 function isOverdue(dueDate, dueTime) {
   if (!dueDate) return false;
-  
+
   const now = new Date();
   const due = new Date(dueDate);
-  
+
   // Add time if specified
   if (dueTime) {
-    const [hours, minutes] = dueTime.split(':');
+    const [hours, minutes] = dueTime.split(":");
     due.setHours(parseInt(hours), parseInt(minutes), 0, 0);
   }
-  
+
   return due < now;
 }
 
 // Update task count display
 function updateTaskCount() {
-  const taskCount = document.getElementById('taskCount');
+  const taskCount = document.getElementById("taskCount");
   if (!taskCount) return;
-  
-  const activeTasks = tasks.filter(task => !task.completed).length;
+
+  const activeTasks = tasks.filter((task) => !task.completed).length;
   const totalTasks = tasks.length;
-  
+
   taskCount.textContent = `${activeTasks} active of ${totalTasks} tasks`;
 }
 
 // Show notification
-function showNotification(message, type = 'info') {
-  const notificationArea = document.getElementById('notificationArea');
+function showNotification(message, type = "info") {
+  const notificationArea = document.getElementById("notificationArea");
   if (!notificationArea) return;
-  
-  const notification = document.createElement('div');
+
+  const notification = document.createElement("div");
   notification.className = `notification ${type}`;
-  
-  let icon = 'fa-info-circle';
-  if (type === 'success') icon = 'fa-check-circle';
-  if (type === 'error') icon = 'fa-exclamation-circle';
-  if (type === 'warning') icon = 'fa-exclamation-triangle';
-  
+
+  let icon = "fa-info-circle";
+  if (type === "success") icon = "fa-check-circle";
+  if (type === "error") icon = "fa-exclamation-circle";
+  if (type === "warning") icon = "fa-exclamation-triangle";
+
   notification.innerHTML = `
     <i class="fas ${icon}"></i>
     <span>${message}</span>
@@ -470,13 +507,13 @@ function showNotification(message, type = 'info') {
       <i class="fas fa-times"></i>
     </button>
   `;
-  
+
   notificationArea.appendChild(notification);
-  
+
   // Remove notification after 5 seconds
   setTimeout(() => {
     if (notification.parentElement) {
-      notification.style.animation = 'slideInRight 0.4s ease reverse';
+      notification.style.animation = "slideInRight 0.4s ease reverse";
       setTimeout(() => {
         if (notification.parentElement) {
           notification.remove();
@@ -487,13 +524,13 @@ function showNotification(message, type = 'info') {
 }
 
 // Event listeners
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener("DOMContentLoaded", function () {
   initTheme();
   fetchTasks();
-  
+
   // Add event listeners
   if (addTaskBtn) {
-    addTaskBtn.addEventListener("click", function(e) {
+    addTaskBtn.addEventListener("click", function (e) {
       e.preventDefault();
       addTask();
     });
@@ -539,12 +576,14 @@ function renderTasksByDate(date) {
   filteredTasks.forEach((task) => {
     const item = document.createElement("div");
     item.className = `date-task-item ${task.priority}`;
-    
-    let timeText = '';
+
+    let timeText = "";
     if (task.dueTime) {
-      timeText = `<br/><i class="far fa-clock"></i> Time: ${formatTime(task.dueTime)}`;
+      timeText = `<br/><i class="far fa-clock"></i> Time: ${formatTime(
+        task.dueTime
+      )}`;
     }
-    
+
     item.innerHTML = `
       <strong>${task.text}</strong><br/>
       <i class="far fa-calendar"></i> Due: ${task.dueDate}
@@ -557,14 +596,14 @@ function renderTasksByDate(date) {
 
 // Initialize theme from localStorage
 function initTheme() {
-  const savedTheme = localStorage.getItem('theme');
-  const themeToggle = document.getElementById('themeToggle');
-  
-  if (savedTheme === 'dark') {
+  const savedTheme = localStorage.getItem("theme");
+  const themeToggle = document.getElementById("themeToggle");
+
+  if (savedTheme === "dark") {
     toggleTheme();
   }
-  
+
   if (themeToggle) {
-    themeToggle.addEventListener('click', toggleTheme);
+    themeToggle.addEventListener("click", toggleTheme);
   }
 }
